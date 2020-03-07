@@ -53,9 +53,10 @@ public class Robot extends TimedRobot {
   /* BUTTONS m_copilotStick */
   int kArmButtonUp = 2;// PID//
   int kArmButtonDown = 1;// PID//
-  int kButtonMotorClimbActivated = 6;
-  int kButtonMotorClimbReverse = 5;
-
+  int kButtonMotorClimbActivated = 9;
+  int kButtonMotorClimbReverse = 11;
+  int kButtonPneumoActivated = 10;
+  int kButtonPneumoReverse = 12;
   /* VELOCITY */
   double kIntakeRedlineVelocity = -0.4;
   double kClimbVelocity = 0.6;
@@ -66,7 +67,7 @@ public class Robot extends TimedRobot {
 
   /* CONSTANTES */
   private static final int kInfraredPort = 3;
-  static final double kHoldDistanceBottomPort = 1.9;
+  static final double kHoldDistanceBottomPort = 2.0;
   static final double kHoldDistanceAutonomous = 1; /* ajustar */
 
   /* CONSTANTES PID INFRAVERMELHO */
@@ -128,7 +129,7 @@ public class Robot extends TimedRobot {
   double lastWorldLinearAccelX;
   double lastWorldLinearAccelY;
   final static double kCollisionThreshold_DeltaG = 0.5f;
-  
+
   static final double kPixyP = .01;
   static final double kPixyI = .0;
   static final double kPixyD = .001;
@@ -151,7 +152,7 @@ public class Robot extends TimedRobot {
   // AUTO 1 - INICIO NA FRENTE DA BOTTOM PORT
   void auto01() {
     // andar reto por 2 segundos
-    if (m_autoTimer.get() < 2) {
+    if (m_autoTimer.get() < 4.5) {
       System.out.println("andando reto por dois segundos");
       m_pidTurnController.setSetpoint(0);
       double pidOutput = m_pidTurnController.calculate(m_gyro.pidGet());
@@ -160,43 +161,43 @@ public class Robot extends TimedRobot {
     }
 
     // abaixar o braco totalmente
-    if (m_autoTimer.get() > 6 && m_autoTimer.get() < 7.5) {
-      System.out.println("abaixando o braco totalmente");
-      m_MotorArm.set(kArmDownVelocity);
-    } else {
-      m_MotorArm.set(kArmVelocity);
-    }
+   // if (m_autoTimer.get() > 6 && m_autoTimer.get() < 7.5) {
+    //  System.out.println("abaixando o braco totalmente");
+     // m_MotorArm.set(kArmDownVelocity);
+   // } else {
+    //  m_MotorArm.set(kArmVelocity);
+  //  }
 
     // // acionar pid do infravermelho pra estacionar
-    if (m_autoTimer.get() > 2 && m_autoTimer.get() < 5) {
+    if (m_autoTimer.get() > 4 && m_autoTimer.get() < 11) {
       System.out.println("estacionando");
       m_pidInfraRedController.setSetpoint(kHoldDistanceBottomPort);
       double pidOutput = m_pidInfraRedController.calculate(m_filter.calculate(m_infrared.getVoltage()));
-      m_chassiDrive.arcadeDrive(-limit(pidOutput, 0.5), 0.0);
+      m_chassiDrive.arcadeDrive(-limit(pidOutput, 0.6), 0.0);
     }
     // // ativar intake
-    if (m_autoTimer.get() > 9) {
+    if (m_autoTimer.get() > 10) {
       System.out.println("ativando intake");
-      m_intakeWindowMotor.set(.3);
+      m_intakeWindowMotor.set(1);
     }
     if (m_autoTimer.get() > 14) {
       System.out.println("desativando intake");
       m_intakeWindowMotor.set(0);
     }
   }
-  //toDo ajustar PID infrared
- 
+  // toDo ajustar PID infrared
+
   // AUTO 2 - INICIO NA FRENTE DA LOAD STATION
   void auto02() {
-    // andar reto por 2 segundos
-    if (m_autoTimer.get() < 2.38) {
+    // andar reto por 3 segundos
+    if (m_autoTimer.get() < 2.10) {
       m_pidTurnController.setSetpoint(0);
       double pidOutput = m_pidTurnController.calculate(m_gyro.pidGet());
       zRotation = pidOutput;
       m_chassiDrive.arcadeDrive(-0.7, limit(zRotation, 0.6));
     }
     // virar 90 graus e andar reto por mais 2 segundos
-    if (m_autoTimer.get() > 2.38 && m_autoTimer.get() < 4) {
+    if (m_autoTimer.get() > 2.10 && m_autoTimer.get() < 5.5) {
       m_pidTurnController.setSetpoint(-90);
       double pidOutput = m_pidTurnController.calculate(m_gyro.pidGet());
       zRotation = pidOutput;
@@ -204,39 +205,40 @@ public class Robot extends TimedRobot {
     }
 
     // andar reto por 2 segundos
-    if (m_autoTimer.get() > 4 && m_autoTimer.get() < 7) {
+   /* if (m_autoTimer.get() > 4 && m_autoTimer.get() < 7) {
       m_pidTurnController.setSetpoint(-90);
       double pidOutput = m_pidTurnController.calculate(m_gyro.pidGet());
       zRotation = pidOutput;
       m_chassiDrive.arcadeDrive(-0.6, limit(zRotation, 0.6));
-    }
+    }*/
 
     // abaixar o braco totalmente
-    if (m_autoTimer.get() > 9 && m_autoTimer.get() < 10.5) {
+   /* if (m_autoTimer.get() > 9 && m_autoTimer.get() < 10.5) {
       System.out.println("abaixando o braco totalmente");
       m_MotorArm.set(kArmDownVelocity);
     } else {
       m_MotorArm.set(kArmVelocity);
-    }
+    }*/
 
     // // acionar pid do infravermelho pra estacionar
-    if (m_autoTimer.get() > 7 && m_autoTimer.get() < 9) {
+    if (m_autoTimer.get() > 5.5 && m_autoTimer.get() < 10) {
       System.out.println("estacionando");
       m_pidInfraRedController.setSetpoint(kHoldDistanceBottomPort);
       double pidOutput = m_pidInfraRedController.calculate(m_filter.calculate(m_infrared.getVoltage()));
       m_chassiDrive.arcadeDrive(-limit(pidOutput, 0.5), 0.0);
     }
     // // ativar intake
-    if (m_autoTimer.get() > 12) {
+    if (m_autoTimer.get() > 10) {
       System.out.println("ativando intake");
-      m_intakeWindowMotor.set(.3);
+      m_intakeWindowMotor.set(1);
     }
     if (m_autoTimer.get() > 14) {
       System.out.println("desativando intake");
       m_intakeWindowMotor.set(0);
     }
   }
-// AUTO 3 - INICIO NA PAREDE DA BOTTOM PORT
+
+  // AUTO 3 - INICIO NA PAREDE DA BOTTOM PORT
   void auto03() {
 
     // andar reto por 4 segundos
@@ -251,7 +253,7 @@ public class Robot extends TimedRobot {
       m_pidTurnController.setSetpoint(90);
       double pidOutput = m_pidTurnController.calculate(m_gyro.pidGet());
       zRotation = pidOutput;
-      m_chassiDrive.arcadeDrive(0,limit(zRotation, 0.6));
+      m_chassiDrive.arcadeDrive(0, limit(zRotation, 0.6));
     }
     if (m_autoTimer.get() > 3 && m_autoTimer.get() < 5) {
       m_pidTurnController.setSetpoint(90);
@@ -274,7 +276,7 @@ public class Robot extends TimedRobot {
       m_pidInfraRedController.setSetpoint(kHoldDistanceBottomPort);
       double pidTurnOutput = m_pidTurnController.calculate(m_gyro.pidGet());
       double pidIROutput = m_pidInfraRedController.calculate(m_filter.calculate(m_infrared.getVoltage()));
-      m_chassiDrive.arcadeDrive(-limit(pidIROutput, 0.6),  limit(pidTurnOutput, 0.6));
+      m_chassiDrive.arcadeDrive(-limit(pidIROutput, 0.6), limit(pidTurnOutput, 0.6));
     }
     // // ativar intake
     if (m_autoTimer.get() > 11) {
@@ -286,11 +288,14 @@ public class Robot extends TimedRobot {
       m_intakeWindowMotor.set(0);
     }
   }
-void auto04 (){
-  if (m_autoTimer.get() < 2)
-  m_MotorArm.set(kArmDownVelocity);
-  else m_MotorArm.set(0);
-}
+
+  void auto04() {
+    if (m_autoTimer.get() < 2)
+      m_MotorArm.set(kArmDownVelocity);
+    else
+      m_MotorArm.set(0);
+  }
+
   @Override
   public void robotInit() {
     m_pidTurnController.enableContinuousInput(-180, 180);
@@ -365,7 +370,7 @@ void auto04 (){
 
     double pidOutputX = m_pidPixyController.calculate(centerX);
     double pidOutputArea = m_pidPixyControllerArea.calculate(area);
-    m_chassiDrive.arcadeDrive(-limit(pidOutputArea,0.7), limit(-pidOutputX, 0.7));
+    m_chassiDrive.arcadeDrive(-limit(pidOutputArea, 0.7), limit(-pidOutputX, 0.7));
     System.out.println(centerX + " " + pidOutputX);
     System.out.println(area + " " + pidOutputArea);
   }
@@ -380,9 +385,10 @@ void auto04 (){
       zRotation = 0;
     }
 
-    //if (m_copilotStick2.getY() != 0 || m_copilotStick3.getX() != 0) {
-      //m_chassiDrive.arcadeDrive(limit(m_copilotStick2.getY(), 0.6), limit(m_copilotStick3.getX(), 0.6), true);
-    //}
+    // if (m_copilotStick2.getY() != 0 || m_copilotStick3.getX() != 0) {
+    // m_chassiDrive.arcadeDrive(limit(m_copilotStick2.getY(), 0.6),
+    // limit(m_copilotStick3.getX(), 0.6), true);
+    // }
   }
 
   void listenAditionalMovements() {
@@ -424,33 +430,10 @@ void auto04 (){
     }
   }
 
-  /* void listenArmMovements() {
-    if (m_copilotStick.getRawButton(kArmButtonUp)) {
-      System.out.println("Arm up=" + kArmUpVelocity);
-      if (armVelocity < kArmUpVelocity) {
-        armVelocity += .02;
-      }
-    } else if (m_copilotStick.getRawButton(kArmButtonDown)) {
-      System.out.println("Arm down=" + kArmDownVelocity);
-      if (armVelocity > kArmDownVelocity) {
-        armVelocity -= .02;
-      }
-    } else {
-      if (armVelocity > kArmVelocity) {
-        armVelocity -= .02;
-      } else if (armVelocity < kArmVelocity) {
-        armVelocity += .02  ;
-      }
-    }
-    System.out.println("Arm=" + armVelocity);
-    m_MotorArm.set(armVelocity);
-    SmartDashboard.putNumber("Arm", armVelocity);
+  void listenArmMovement() {
+    m_MotorArm.set(m_copilotStick.getY()*0.7);
   }
- */
 
- void listenTestArmMovement (){
-  m_MotorArm.set(m_copilotStick.getY());
- }
   void listenClimbButton() {
     if (m_copilotStick.getRawButton(kButtonMotorClimbActivated)) {
       m_climbMotors.set(-kClimbVelocity);
@@ -459,10 +442,10 @@ void auto04 (){
     } else {
       m_climbMotors.set(0);
     }
-    if (m_copilotStick1.getThrottle() > 0) {
+    if (m_copilotStick.getRawButton(kButtonPneumoActivated)) {
       solenoid.set(DoubleSolenoid.Value.kForward);
     }
-    if (m_copilotStick.getThrottle() > 0) {
+    if (m_copilotStick.getRawButton(kButtonPneumoReverse)) {
       solenoid.set(DoubleSolenoid.Value.kReverse);
     }
 
@@ -492,7 +475,7 @@ void auto04 (){
 
     listenIntakeButtons();
 
-    listenTestArmMovement();
+    listenArmMovement();
 
     listenClimbButton();
 
@@ -518,7 +501,7 @@ void auto04 (){
     SmartDashboard.putNumber("SetPoint", setpoint);
     SmartDashboard.putNumber("Distance", m_infrared.getVoltage());
     NetworkTable table = tableInstance.getTable("SmartDashboard");
-    //System.out.println(table.getEntry("sig").getDouble(0.0));
+    // System.out.println(table.getEntry("sig").getDouble(0.0));
     SmartDashboard.putBoolean("Power Cell", table.getEntry("sig").getDouble(0.0) == 1.0);
   }
 
